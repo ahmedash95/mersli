@@ -15,7 +15,7 @@ npm install -g mersli
 ```
 
 ## Demo
-![Demo](demo.mp4)
+https://user-images.githubusercontent.com/8272048/233855236-709809c7-2d3b-48b8-9caa-a5b713418c87.mp4
 
 ## Usage
 
