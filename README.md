@@ -19,7 +19,7 @@ https://user-images.githubusercontent.com/8272048/233855236-709809c7-2d3b-48b8-9
 
 ## Usage
 
-a quick example from the `example.json` in the current repo
+a quick example from the `example.json` in this repo
 
 ```bash
 mersli -i ./example.json
