@@ -1,6 +1,6 @@
 {
   "name": "mersli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Make html slide from your mermaids",
   "repository": "https://github.com/ahmedash95/mersli",
   "author": "Ahmed Ammar",
@@ -31,7 +31,7 @@
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "start:windows": "nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" src/index.ts",
     "create": "npm run build && npm run test",
-    "build": "tsc -p .",
+    "build": "tsc -p . && cp -r src/views/ lib/views/",
     "local": "sudo npm i -g && pizza",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   }

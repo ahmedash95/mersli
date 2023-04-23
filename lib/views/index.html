@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mermaid Slides</title>
+	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+	<script src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script>
+</head>
+
+<body class="bg-gray-100 h-screen">
+	<div class="h-full flex items-center justify-center" id="app">
+		<div class="bg-white w-4/5 h-4/5 shadow-lg rounded-lg overflow-hidden">
+			<div class="h-full relative">
+				<!-- Slide player container -->
+				<div class="h-full overflow-scroll" ref="slidePlayer" id="slide-player">
+				</div>
+
+				<!-- Progress bar and controls -->
+				<div class="absolute bottom-0 left-0 w-full bg-gray-200 p-4">
+					<div class="w-full h-1 bg-gray-300 rounded-full">
+						<div class="h-full bg-indigo-600 rounded-full" style="width: 0%;">
+							<!-- The progress bar width will be set by JavaScript -->
+						</div>
+					</div>
+					<div class="flex items-center justify-between mt-2">
+						<div class="text-sm text-gray-600">
+							<!-- The slide counter will be updated by JavaScript -->
+							Slide <span id="current-slide">{{ current }}</span> of <span id="total-slides">{{ list.length }} </span>
+						</div>
+						<div>
+							<button id="prev-btn" :class="{
+									'bg-gray-300 text-gray-400 font-bold py-1 px-4 rounded-l': current == 1,
+									'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-4 rounded-l': current > 1,
+								}" @click="prevSlide" :disabled="current == 1">
+								Prev
+							</button>
+							<button id="next-btn" :class="{
+								'bg-gray-300 text-gray-400 font-bold py-1 px-4 rounded-r': current == list.length,
+								'bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-1 px-4 rounded-r': current < list.length,
+								}" @click="nextSlide" :disabled="current == list.length">
+								Next
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="module">
+		const app = new Vue({
+			el: "#app",
+			data: {
+				list: [
+					// The mermaid json content will be injected here
+				],
+				current: 0
+			},
+			watch: {
+				current: function (val) {
+					if (val == 0 || val > this.list.length) {
+						return
+					}
+
+					this.pushCurrentSlideToUrl()
+					this.renderCurrentSlide()
+				}
+			},
+			mounted() {
+				fetch('data')
+					.then(response => response.json())
+					.then(data => {
+						this.list = data
+						this.resetCurrentSlide()
+					})
+
+				window.addEventListener("keydown", this.handleKeydown);
+			},
+			beforeDestroy() {
+				window.removeEventListener("keydown", this.handleKeydown);
+			},
+			methods: {
+				pushCurrentSlideToUrl() {
+					const url = new URL(window.location.href);
+					url.searchParams.set("slide", this.current);
+					window.history.pushState({}, "", url.toString());
+				},
+				resetCurrentSlide() {
+					const url = new URL(window.location.href);
+					const slide = url.searchParams.get("slide");
+					if (slide && slide <= this.list.length) {
+						this.current = parseInt(slide);
+					} else {
+						this.current = 1;
+					}
+				},
+				renderCurrentSlide() {
+					const renderElement = document.getElementById("slide-player");
+					let insert = function (code) {
+						renderElement.innerHTML = code;
+					};
+
+					// const content = "graph TB\na-->b";
+					const content = this.list[this.current - 1];
+
+					renderElement.innerHTML = "";
+					mermaid.render("preparedScheme", content, insert);
+				},
+				prevSlide() {
+					if (this.current > 1) {
+						this.current--;
+					}
+				},
+				nextSlide() {
+					if (this.current < this.list.length) {
+						this.current++;
+					}
+				},
+				handleKeydown(event) {
+					if (event.key === "[") {
+						this.prevSlide();
+					} else if (event.key === "]") {
+						this.nextSlide();
+					}
+				},
+			}
+		})
+	</script>
+</body>
+
+</html>
